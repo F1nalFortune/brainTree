@@ -3,8 +3,9 @@ logs
 *.log
 
 .env
-/node_modules
+node_modules
 .DS_Store
+.git
 
 # Runtime data
 pids
