@@ -3,7 +3,7 @@ logs
 *.log
 
 .env
-node_modules
+/node_modules
 .DS_Store
 
 # Runtime data
