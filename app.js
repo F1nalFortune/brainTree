@@ -11,9 +11,11 @@ var back = require('express-back');
 var mongoose = require('mongoose');
 var passport = require('passport');
 var braintree = require('braintree');
+var flash = require('connect-flash');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
+var checkout = require('./routes/checkout');
 
 var app = express();
 
@@ -32,6 +34,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(flash());
 
 // PASSPORT STUFF
 app.use(require('cookie-session')({
@@ -47,6 +50,7 @@ app.use(passport.session());
 
 app.use('/', routes);
 app.use('/users', users);
+app.use('/checkout', checkout);
 
 // add authenticate method
 var User = require('./models/user');
@@ -75,7 +79,7 @@ if (app.get('env') === 'development') {
   });
 }
 
-mongoose.connect('mongodb://localhost/authentication-app', { useMongoClient: true });
+mongoose.connect('mongodb://localhost:27017/brainTree', { useNewUrlParser: true });
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
