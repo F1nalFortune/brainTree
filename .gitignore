@@ -6,6 +6,8 @@ logs
 node_modules
 .DS_Store
 .git
+views/checkouts/new.jade
+views/checkouts/new.ejs
 
 # Runtime data
 pids

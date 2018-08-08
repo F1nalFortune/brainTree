@@ -12,6 +12,9 @@ var mongoose = require('mongoose');
 var passport = require('passport');
 var braintree = require('braintree');
 var flash = require('connect-flash');
+var dropin = require('braintree-web-drop-in');
+
+dropin.create({ /* options */ }, callback);
 
 var routes = require('./routes/index');
 var users = require('./routes/users');

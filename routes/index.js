@@ -3,6 +3,8 @@ var express = require('express');
 var router = express.Router();
 var braintree = require('braintree');
 var gateway = require('../lib/gateway');
+var passport = require('passport');
+var User = require('../models/user');
 
 
 
@@ -55,13 +57,11 @@ function createResultObject(transaction) {
 // });
 
 
-router.get('/', function (req, res) {
-  res.redirect('/checkouts/new');
-});
+
 
 router.get('/checkouts/new', function (req, res) {
   gateway.clientToken.generate({}, function (err, response) {
-    res.render('checkouts/new', {clientToken: response.clientToken, messages: req.flash('error')});
+    res.render('checkouts/new.ejs', {clientToken: response.clientToken, messages: req.flash('error'), user: req.user });
   });
 });
 
@@ -97,7 +97,90 @@ router.post('/checkouts', function (req, res) {
   });
 });
 
-module.exports = router;
+//tokens
+router.get("/client_token", function (req, res) {
+  gateway.clientToken.generate({}, function (err, response) {
+    res.send(response.clientToken);
+  });
+});
+
+
+
+
+function isAuthenticated(req, res, next) {
+  if (req.user)
+    return next();
+  else
+    res.redirect('/');
+}
+
+router.get('/dashboard', isAuthenticated, (req, res) => {
+  res.render('dashboard', {user: req.user});
+});
+/* GET home page. */
+router.get('/', (req, res, next) =>  {
+  res.render('index.ejs', { title: 'Express', user: req.user });
+});
+
+/* Register */
+
+router.get('/register', (req, res) => {
+  if (req.user)
+    return res.back;
+  res.render('register', {user: req.user });
+});
+
+/* About */
+
+router.get('/about', (req, res) => {
+  res.render('about.ejs', {user: req.user });
+});
+
+
+/* Products */
+
+router.get('/products', (req, res) => {
+  res.render('products.ejs', {user: req.user });
+});
+
+
+/* Contact */
+
+router.get('/contact/', (req, res) => {
+  res.render('contact.ejs', {user: req.user });
+});
+
+router.get('/cbd/', (req, res) => {
+  res.render('cbd.ejs', {user: req.user });
+});
+/* Create User */
+
+router.post('/register', (req, res) => {
+  User.register( new User ({ username: req.body.username}), req.body.password, (err, user) => {
+    if (err)
+      return res.render('register', { user: user });
+    passport.authenticate('local')(req, res, () => {
+      console.log(res);
+      res.redirect('/');
+    });
+  });
+});
+
+
+
+//Don't need after installed navbar
+router.get('/login', (req, res) => {
+ res.render('login.ejs', {user: req.user });
+});
+
+router.post('/login', passport.authenticate('local'), (req, res) => {
+  res.redirect('/');
+});
+
+router.get('/logout', (req, res) => {
+  req.logout();
+  res.redirect('/');
+});
 
 
 module.exports = router;
